@@ -2,7 +2,7 @@ import javax.swing.*;
 
 public class SoundMain {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         initFrame();
     }
 
