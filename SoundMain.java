@@ -1,13 +1,12 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class SoundMain {
     private static File[] music = null;
@@ -27,16 +26,23 @@ public class SoundMain {
         JButton nextButton = new JButton("Next");
         JButton previousButton = new JButton("Previous");
 
+        //DISCORD:
         Color discord = new Color(42,45,50);
 
         //Frame:
         JFrame frame = new JFrame("Sound Player");
         frame.setLayout(new GridBagLayout());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
+        frame.setSize(300, 500);
+        frame.setMinimumSize(new Dimension(frame.getSize()));
+        //Frame Icon:
+        try {
+            frame.setIconImage(ImageIO.read(new File("Icon/playIcon.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        //Text pane/ jTable now:
-
+        //Table:
         DefaultTableModel model = new DefaultTableModel(0, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -44,18 +50,12 @@ public class SoundMain {
             }
         };
         JTable table = new JTable(model);
-
         table.setSize(200,400);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        //table.setEditable(false);
-        //table.setBackground(discord);
+        //Scroll:
         JScrollPane scroll = new JScrollPane(table);
         scroll.setPreferredSize(table.getSize());
-
-        //sets text color to white.
-        //SimpleAttributeSet sas = new SimpleAttributeSet();
-        //StyleConstants.setForeground(sas, Color.LIGHT_GRAY);
 
         model.addColumn("#");
         model.addColumn("Name");
@@ -79,10 +79,14 @@ public class SoundMain {
             e.printStackTrace();
         }
 
+        //BUTTONS:
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ++curFileIndex;
+                if (curFileIndex == music.length - 1) {
+                    curFileIndex = -1;
+                }
+                curFileIndex++;
                 cur = music[curFileIndex];
                 System.out.println(cur);
                 SoundManager.playSound(cur);
@@ -92,7 +96,10 @@ public class SoundMain {
         previousButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                --curFileIndex;
+                if (curFileIndex == 0) {
+                    curFileIndex = music.length;
+                }
+                curFileIndex--;
                 cur = music[curFileIndex];
                 System.out.println(cur);
                 SoundManager.playSound(cur);
@@ -108,13 +115,13 @@ public class SoundMain {
             }
         });
 
-        scroll.getViewport().setBackground(Color.PINK);
-        table.setGridColor(Color.BLUE);
-        playboySex.setBackground(discord);
-        scroll.setBackground(discord);
-        playButton.setBackground(Color.RED);
-        table.setBackground(Color.CYAN);
-        frame.getContentPane().setBackground(Color.YELLOW);
+        //scroll.getViewport().setBackground(Color.PINK);
+        //table.setGridColor(Color.BLUE);
+        //playboySex.setBackground(discord);
+        //scroll.setBackground(discord);
+        //playButton.setBackground(Color.RED);
+        //table.setBackground(Color.GRAY);
+        frame.getContentPane().setBackground(discord);
 
         c.insets = new Insets(2, 2, 2, 2);
         c.gridx = 0;
@@ -139,4 +146,3 @@ public class SoundMain {
     }
 
 }
-
