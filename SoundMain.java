@@ -44,14 +44,15 @@ public class SoundMain {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setSize(300, 600);
         frame.setMinimumSize(new Dimension(frame.getSize()));
-
-        JLabel sex = new JLabel(":");
         //Frame Icon:
         try {
             frame.setIconImage(ImageIO.read(new File("Icon/playIcon.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //Time Label:
+        JLabel sex = new JLabel(":");
 
         //Table:
         DefaultTableModel model = new DefaultTableModel(0, 0) {
@@ -111,6 +112,7 @@ public class SoundMain {
             public void mouseClicked(MouseEvent e) {
                 int row = table.rowAtPoint(e.getPoint());
                 setCurIndexTo(row);
+                SoundManager.openFile(cur);
                 table.repaint();
             }
         });
@@ -172,8 +174,10 @@ public class SoundMain {
                         public void update(LineEvent e) {
 
                             if (e.getType() == LineEvent.Type.STOP) {
-                                SoundManager.stopSound();
-                                playButton.setText("Play");
+                                if (clit.getMicrosecondPosition() >= clit.getMicrosecondLength()) {
+                                    SoundManager.stopSound();
+                                    playButton.setText("Play");
+                                }
                             }
                         }
                     });
@@ -224,6 +228,6 @@ public class SoundMain {
     public static void setCurIndexTo(int index) {
         curFileIndex = index;
         cur = music[curFileIndex];
-        SoundManager.openFile(cur);
+
     }
 }

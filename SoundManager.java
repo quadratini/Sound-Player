@@ -37,6 +37,7 @@ public class SoundManager {
         if (currClip != null) {
             clipTime = currClip.getMicrosecondPosition();
             currClip.stop();
+            //System.out.println(clipTime);
         }
     }
 
@@ -67,7 +68,7 @@ public class SoundManager {
             if (currFile != file) {
                 openFile(file);
             } else {
-                System.out.println("anal bambo: " + clipTime);
+                //System.out.println("anal bambo: " + clipTime);
             }
             playSound();
     }
