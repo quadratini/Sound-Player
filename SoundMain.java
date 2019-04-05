@@ -1,12 +1,21 @@
 import javax.imageio.ImageIO;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SoundMain {
     private static File[] music = null;
@@ -33,8 +42,10 @@ public class SoundMain {
         JFrame frame = new JFrame("Sound Player");
         frame.setLayout(new GridBagLayout());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(300, 500);
+        frame.setSize(300, 600);
         frame.setMinimumSize(new Dimension(frame.getSize()));
+
+        JLabel sex = new JLabel(":");
         //Frame Icon:
         try {
             frame.setIconImage(ImageIO.read(new File("Icon/playIcon.png")));
@@ -52,6 +63,21 @@ public class SoundMain {
         JTable table = new JTable(model);
         table.setSize(200,400);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        DefaultTableCellRenderer dong = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object obj, boolean isSelected, boolean hasFocus, int row, int column) {
+
+                Component cell = super.getTableCellRendererComponent(table, obj, isSelected, hasFocus, row, 1);
+                if (row == curFileIndex) {
+                    cell.setBackground(new Color(165,219,241));
+                } else {
+                    cell.setBackground(Color.white);
+                }
+                return cell;
+            }
+        };
+        table.setDefaultRenderer(Object.class, dong);
 
         //Scroll:
         JScrollPane scroll = new JScrollPane(table);
@@ -79,6 +105,16 @@ public class SoundMain {
             e.printStackTrace();
         }
 
+        //NUTTONS
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                setCurIndexTo(row);
+                table.repaint();
+            }
+        });
+
         //BUTTONS:
         nextButton.addActionListener(new ActionListener() {
             @Override
@@ -86,10 +122,11 @@ public class SoundMain {
                 if (curFileIndex == music.length - 1) {
                     curFileIndex = -1;
                 }
-                curFileIndex++;
-                cur = music[curFileIndex];
-                System.out.println(cur);
-                SoundManager.playSound(cur);
+                setCurIndexTo(++curFileIndex);
+                SoundManager.openFile(cur);
+                //SoundManager.playSound(cur);
+
+                table.repaint();
             }
         });
 
@@ -99,50 +136,94 @@ public class SoundMain {
                 if (curFileIndex == 0) {
                     curFileIndex = music.length;
                 }
-                curFileIndex--;
-                cur = music[curFileIndex];
-                System.out.println(cur);
-                SoundManager.playSound(cur);
+                setCurIndexTo(--curFileIndex);
+                SoundManager.openFile(cur);
+                //SoundManager.playSound(cur);
+
+                table.repaint();
             }
         });
+
+        ScheduledExecutorService sexy = Executors.newScheduledThreadPool(1);
+        sexy.scheduleAtFixedRate (new Runnable() {
+            @Override
+            public void run() {
+                Clip clit = SoundManager.getClip();
+                long one = SoundManager.getTime();
+                long two = 0;
+                if (clit != null) {
+                    one = clit.getMicrosecondPosition();
+                    two = clit.getMicrosecondLength();
+                }
+                sex.setText(microToMacro(one) + "/" + microToMacro(two));
+                sex.repaint();
+            }
+        }, 0, 5, TimeUnit.MILLISECONDS);
 
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cur = music[curFileIndex];
-                System.out.println(cur);
-                SoundManager.playSound(cur);
+                if (playButton.getText() == "Play") {
+                    SoundManager.playSound(cur);
+                    playButton.setText("Pause");
+
+                    Clip clit = SoundManager.getClip();
+                    clit.addLineListener(new LineListener() {
+                        public void update(LineEvent e) {
+
+                            if (e.getType() == LineEvent.Type.STOP) {
+                                SoundManager.stopSound();
+                                playButton.setText("Play");
+                            }
+                        }
+                    });
+                } else {
+                    SoundManager.pauseSound();
+                    playButton.setText("Play");
+                }
             }
         });
 
-        //scroll.getViewport().setBackground(Color.PINK);
-        //table.setGridColor(Color.BLUE);
-        //playboySex.setBackground(discord);
-        //scroll.setBackground(discord);
-        //playButton.setBackground(Color.RED);
-        //table.setBackground(Color.GRAY);
         frame.getContentPane().setBackground(discord);
+
+        playboySex.add(previousButton);
+        playboySex.add(playButton);
+        playboySex.add(nextButton);
+
+        // "hey ronny, u need to remove anywhere that adds text area because
+        // it's now added to scroll pane."
+        //panel.add(scroll, c);
+
+        setCurIndexTo(curFileIndex);
 
         c.insets = new Insets(2, 2, 2, 2);
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
         c.gridheight = 2;
-
-        // "hey ronny, u need to remove anywhere that adds text area because
-        // it's now added to scroll pane."
-        //panel.add(scroll, c);
-        //panel.add(table, c);
-        //frame.add(table, c);
-
-        playboySex.add(previousButton);
-        playboySex.add(playButton);
-        playboySex.add(nextButton);
-
         frame.add(scroll, c); //TAKE THIS SCROLL
+
         c.gridy = 2;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        sex.setForeground(Color.white);
+        frame.add(sex, c);
+
+        c.gridy = 3;
         frame.add(playboySex, c);
         frame.setVisible(true);
     }
 
+    public static String microToMacro(long micropenis) {
+        long second = micropenis / 1000000;
+        long minute = second / 60;
+        second %= 60;
+        return  (minute < 10 ? "0" + minute : minute) + ":" + (second < 10 ? "0" + second : second);
+    }
+
+    public static void setCurIndexTo(int index) {
+        curFileIndex = index;
+        cur = music[curFileIndex];
+        SoundManager.openFile(cur);
+    }
 }
