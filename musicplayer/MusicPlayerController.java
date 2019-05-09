@@ -91,7 +91,6 @@ public class MusicPlayerController {
             public void mouseClicked(MouseEvent e) {
                 int row = songTable.rowAtPoint(e.getPoint());
                 model.setCurIndexTo(row);
-                SoundPlayer.openFile(model.getCurSong());
                 songTable.repaint();
             }
         });
@@ -103,7 +102,6 @@ public class MusicPlayerController {
             public void actionPerformed(ActionEvent e) {
                 SoundPlayer.stopSound();
                 model.nextSong();
-                //SoundPlayer.openFile(model.getCurSong());
                 SoundPlayer.playSound(model.getCurSong());
                 songTable.repaint();
             }
@@ -115,7 +113,6 @@ public class MusicPlayerController {
             public void actionPerformed(ActionEvent e) {
                 SoundPlayer.stopSound();
                 model.prevSong();
-                //SoundPlayer.openFile(model.getCurSong());
                 SoundPlayer.playSound(model.getCurSong());
                 songTable.repaint();
             }
