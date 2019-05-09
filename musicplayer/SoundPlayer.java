@@ -56,7 +56,7 @@ public class SoundPlayer {
             currClip = AudioSystem.getClip();
             currClip.open(audioIn);
             FloatControl gainControl = (FloatControl) currClip.getControl(FloatControl.Type.MASTER_GAIN);
-            gainControl.setValue(-30f);
+            gainControl.setValue(-15f);
 
             clipTime = 0;
         } catch (Exception e) {
@@ -66,9 +66,9 @@ public class SoundPlayer {
     }
 
     public static void playSound(File file) {
-            if (currFile != file) {
-                openFile(file);
-            }
-            playSound();
+        if (currFile != file) {
+            openFile(file);
+        }
+        playSound();
     }
 }

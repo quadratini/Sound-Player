@@ -23,7 +23,7 @@ public class MusicPlayer {
 
     public void nextSong() {
         if (curFileIndex == musicFiles.length - 1) {
-            curFileIndex = musicFiles.length;
+            curFileIndex = -1;
         }
         setCurIndexTo(++curFileIndex);
     }

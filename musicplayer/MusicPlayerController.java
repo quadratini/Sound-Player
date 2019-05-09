@@ -101,8 +101,10 @@ public class MusicPlayerController {
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SoundPlayer.stopSound();
                 model.nextSong();
-                SoundPlayer.openFile(model.getCurSong());
+                //SoundPlayer.openFile(model.getCurSong());
+                SoundPlayer.playSound(model.getCurSong());
                 songTable.repaint();
             }
         });
@@ -111,8 +113,10 @@ public class MusicPlayerController {
         previousButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SoundPlayer.stopSound();
                 model.prevSong();
-                SoundPlayer.openFile(model.getCurSong());
+                //SoundPlayer.openFile(model.getCurSong());
+                SoundPlayer.playSound(model.getCurSong());
                 songTable.repaint();
             }
         });
@@ -123,13 +127,13 @@ public class MusicPlayerController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (playButton.getText() == "Play") {
+                    SoundPlayer.stopSound();
                     SoundPlayer.playSound(model.getCurSong());
                     playButton.setText("Pause");
 
                     Clip clip = SoundPlayer.getClip();
                     clip.addLineListener(new LineListener() {
                         public void update(LineEvent e) {
-
                             if (e.getType() == LineEvent.Type.STOP) {
                                 if (clip.getMicrosecondPosition() >= clip.getMicrosecondLength()) {
                                     SoundPlayer.stopSound();
