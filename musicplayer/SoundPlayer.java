@@ -1,10 +1,12 @@
+package musicplayer;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import java.io.File;
 
-public class SoundManager {
+public class SoundPlayer {
     private static File currFile;
     private static Clip currClip;
     private static long clipTime;
@@ -37,7 +39,6 @@ public class SoundManager {
         if (currClip != null) {
             clipTime = currClip.getMicrosecondPosition();
             currClip.stop();
-            //System.out.println(clipTime);
         }
     }
 
@@ -67,8 +68,6 @@ public class SoundManager {
     public static void playSound(File file) {
             if (currFile != file) {
                 openFile(file);
-            } else {
-                //System.out.println("anal bambo: " + clipTime);
             }
             playSound();
     }
